@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "71228375420",
+    "project_id": "the-essential-fitness-app",
+    "storage_bucket": "the-essential-fitness-app.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:71228375420:android:e2790130838dd0de8da4f9",
+        "android_client_info": {
+          "package_name": "com.christianutrup.the_essential_fitness_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJVdb33f-wHKcVW2x7al1p8zma4w7Hblo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:71228375420:android:7650066fd60493028da4f9",
+        "android_client_info": {
+          "package_name": "com.example.the_essential_fitness_app"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyAJVdb33f-wHKcVW2x7al1p8zma4w7Hblo"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
