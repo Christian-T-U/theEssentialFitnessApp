@@ -51,6 +51,14 @@ dependencies:
   shared_preferences: ^2.3.0
   syncfusion_flutter_charts: 31.1.19
 
+  # For Geolocation
+  geolocator: 14.0.2
+
+  # For running icons
+  font_awesome_flutter: ^10.7.0
+
+
+
 
 dev_dependencies:
   flutter_test:

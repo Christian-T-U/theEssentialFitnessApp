@@ -4,6 +4,8 @@ import 'package:firebase_core/firebase_core.dart';
 import '../firebase_options.dart';
 import 'package:syncfusion_flutter_charts/charts.dart';
 import '../common/global.dart';
+import 'running.dart';
+import 'workout.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -15,9 +17,9 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool _isVisible = false;
   bool _isVisible1 = false;
-  bool _isVisible2 = false;
-  bool _isVisible3 = false;
-  bool _isVisible4 = false;
+  // bool _isVisible2 = false;
+  // bool _isVisible3 = false;
+  // bool _isVisible4 = false;
   List<dynamic> todaysGoals = [];
 
   void temp() {
@@ -39,40 +41,32 @@ class _HomePageState extends State<HomePage> {
             todaysGoals.add(exerciseArray![i + 4]); //reps
           }
         }
+        setState(() {
+          todaysGoals;
+        });
       }
     }
   }
 
-  Future<void> _streakUpdate() async {}
+  //Future<void> _streakUpdate() async {}
 
   @override
   void initState() {
-    _streakUpdate();
+    //_streakUpdate();
+
+    _loadTodayGoals();
+
     super.initState();
-    Future.delayed(const Duration(milliseconds: 1500), () {
+    Future.delayed(const Duration(milliseconds: 400), () {
+      //settings
       setState(() {
         _isVisible = true;
       });
     });
-    Future.delayed(const Duration(milliseconds: 2000), () {
+    Future.delayed(const Duration(milliseconds: 600), () {
+      //user card
       setState(() {
         _isVisible1 = true;
-      });
-    });
-    Future.delayed(const Duration(milliseconds: 4000), () {
-      setState(() {
-        _isVisible2 = true;
-      });
-    });
-    Future.delayed(const Duration(milliseconds: 5000), () {
-      setState(() {
-        _isVisible3 = true;
-      });
-    });
-    Future.delayed(const Duration(milliseconds: 7000), () {
-      _loadTodayGoals();
-      setState(() {
-        _isVisible4 = true;
       });
     });
   }
@@ -118,7 +112,7 @@ class _HomePageState extends State<HomePage> {
               children: [
                 Center(
                   child: AnimatedSlide(
-                    offset: _isVisible3 ? Offset(0, 0) : Offset(0, -1),
+                    offset: _isVisible ? Offset(0, 0) : Offset(0, -1),
                     duration: const Duration(milliseconds: 600),
                     curve: Curves.easeInOut,
                     child: Card(
@@ -130,7 +124,7 @@ class _HomePageState extends State<HomePage> {
                       child: Padding(
                         padding: const EdgeInsets.all(16.0),
                         child: Text(
-                          nametag!,
+                          nametag ?? "Error: nametag didn't load",
                           style: TextStyle(
                             fontSize: 16,
                             color: Colors.blue,
@@ -144,8 +138,8 @@ class _HomePageState extends State<HomePage> {
                 Center(
                   child: AnimatedSlide(
                     //player card
-                    offset: _isVisible1 ? Offset(0, 0) : Offset(0, 10),
-                    duration: const Duration(milliseconds: 3000),
+                    offset: _isVisible ? Offset(0, 0) : Offset(0, 10),
+                    duration: const Duration(milliseconds: 2000),
                     curve: Curves.easeInOut,
                     child: Card(
                       shape: RoundedRectangleBorder(
@@ -158,15 +152,22 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 AnimatedSlide(
-                  offset: _isVisible2 ? Offset(0, 0) : Offset(0, 10),
-                  duration: const Duration(milliseconds: 2500),
+                  offset: _isVisible ? Offset(0, 0) : Offset(0, 30),
+                  duration: const Duration(milliseconds: 2000),
                   curve: Curves.easeInOut,
                   child: Center(
                     child: Row(
                       mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                       children: [
                         GestureDetector(
-                          onTap: temp,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => runningPage(),
+                              ),
+                            );
+                          },
                           child: Card(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -187,7 +188,14 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         GestureDetector(
-                          onTap: temp,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => ExercisesPage(),
+                              ),
+                            );
+                          },
                           child: Card(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -254,57 +262,59 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-
-                AnimatedSlide(
-                  offset:
-                      _isVisible4 ? const Offset(0, 0) : const Offset(0, 20),
-                  duration: const Duration(milliseconds: 2500),
-                  curve: Curves.easeInOut,
-                  child:
-                      todaysGoals.isEmpty
-                          ? const Center(
-                            child: Text(
-                              "No goals for today!",
-                              style: TextStyle(
-                                color: Colors.white,
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
+                Expanded(
+                  child: AnimatedSlide(
+                    offset:
+                        _isVisible1 ? const Offset(0, 0) : const Offset(0, 35),
+                    duration: const Duration(milliseconds: 2500),
+                    curve: Curves.easeInOut,
+                    child:
+                        todaysGoals.isEmpty
+                            ? const Center(
+                              child: Text(
+                                "No goals for today!",
+                                style: TextStyle(
+                                  color: Colors.white,
+                                  fontSize: 18,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
-                            ),
-                          )
-                          : ListView.builder(
-                            itemCount: todaysGoals.length ~/ 5,
-                            itemBuilder: (context, index) {
-                              final base = index * 5;
-                              final name = todaysGoals[base + 1];
-                              final weight = todaysGoals[base + 2];
-                              final sets = todaysGoals[base + 3];
-                              final reps = todaysGoals[base + 4];
+                            )
+                            : ListView.builder(
+                              itemCount: todaysGoals.length ~/ 5,
+                              itemBuilder: (context, index) {
+                                final base = index * 5;
+                                final name = todaysGoals[base + 1];
+                                final reps = todaysGoals[base + 2];
+                                final sets = todaysGoals[base + 3];
+                                final weight = todaysGoals[base + 4];
 
-                              return Card(
-                                color: Colors.white,
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                margin: const EdgeInsets.symmetric(
-                                  vertical: 6,
-                                  horizontal: 8,
-                                ),
-                                child: ListTile(
-                                  title: Text(
-                                    name,
-                                    style: const TextStyle(
-                                      fontWeight: FontWeight.bold,
-                                      fontSize: 20,
+                                return Card(
+                                  color: Colors.white,
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  margin: const EdgeInsets.symmetric(
+                                    vertical: 6,
+                                    horizontal: 8,
+                                  ),
+                                  child: ListTile(
+                                    title: Text(
+                                      name,
+                                      style: const TextStyle(
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.blue,
+                                        fontSize: 20,
+                                      ),
+                                    ),
+                                    subtitle: Text(
+                                      "$name  •  $sets x $reps @ ${weight}lbs",
                                     ),
                                   ),
-                                  subtitle: Text(
-                                    "Weight: $weight | Sets: $sets | Reps: $reps",
-                                  ),
-                                ),
-                              );
-                            },
-                          ),
+                                );
+                              },
+                            ),
+                  ),
                 ),
               ],
             ),

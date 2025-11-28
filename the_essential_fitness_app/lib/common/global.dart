@@ -20,4 +20,4 @@ List<dynamic>? runtimes;
 
 bool? tutorial;
 
-User? user = FirebaseAuth.instance.currentUser;
+User? user;

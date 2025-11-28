@@ -65,7 +65,7 @@ class _SignInPageState extends State<SignInPage> {
         password: _passwordController.text.trim(),
       );
 
-      final user = result.user;
+      user = result.user;
 
       if (user != null) {
         if (!mounted) return;

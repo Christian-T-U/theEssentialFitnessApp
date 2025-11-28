@@ -81,9 +81,11 @@ class _signUpPageState extends State<signUpPage> {
           'height': 0,
           'weight': 0,
           'streak': 0,
+          'tasksComplete': false,
           'registered': today,
           'tutorial': false,
           'exercises': [],
+          'runs': [],
         });
         print('✅ User created successfully: ${user.uid}');
       }
