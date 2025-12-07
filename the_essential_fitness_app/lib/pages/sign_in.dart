@@ -6,6 +6,7 @@ import '../firebase_options.dart';
 import '../common/global.dart';
 import './home.dart';
 import './sign_up.dart';
+import 'dart:math';
 
 class SignInPage extends StatefulWidget {
   const SignInPage({super.key});
@@ -54,8 +55,19 @@ class _SignInPageState extends State<SignInPage> {
     height = userData?['height'];
     weight = userData?['weight'];
     exerciseArray = userData?['exercises'];
-    runtimes = userData?['runtimes'];
+    runs = userData?['runs'];
     tutorial = userData?['tutorial'];
+    bestRun1mi = userData?['bestRun1mi'];
+    bestRun2mi = userData?['bestRun2mi'];
+    bestRun5mi = userData?['bestRun5mi'];
+    bestRun10mi = userData?['bestRun10mi'];
+
+    //get tip from server
+    final docTwo =
+        await FirebaseFirestore.instance.collection('tips').doc('1').get();
+    final docData = docTwo.data();
+    int rn = Random().nextInt(7);
+    tip = docData!["$rn"];
   }
 
   Future<void> _signIn() async {

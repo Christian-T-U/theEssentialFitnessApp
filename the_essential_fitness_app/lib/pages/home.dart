@@ -6,6 +6,7 @@ import 'package:syncfusion_flutter_charts/charts.dart';
 import '../common/global.dart';
 import 'running.dart';
 import 'workout.dart';
+import 'leaderboard.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -17,9 +18,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool _isVisible = false;
   bool _isVisible1 = false;
-  // bool _isVisible2 = false;
-  // bool _isVisible3 = false;
-  // bool _isVisible4 = false;
   List<dynamic> todaysGoals = [];
 
   void temp() {
@@ -34,11 +32,11 @@ class _HomePageState extends State<HomePage> {
       if (exerciseArray!.isNotEmpty) {
         for (int i = 0; i < exerciseArray!.length; i += 5) {
           if (exerciseArray![i] == dayOfWeek) {
-            todaysGoals.add(exerciseArray![i]); //day
-            todaysGoals.add(exerciseArray![i + 1]); //name
-            todaysGoals.add(exerciseArray![i + 2]); //weight
-            todaysGoals.add(exerciseArray![i + 3]); //sets
-            todaysGoals.add(exerciseArray![i + 4]); //reps
+            todaysGoals.add(exerciseArray![i]);
+            todaysGoals.add(exerciseArray![i + 1]);
+            todaysGoals.add(exerciseArray![i + 2]);
+            todaysGoals.add(exerciseArray![i + 3]);
+            todaysGoals.add(exerciseArray![i + 4]);
           }
         }
         setState(() {
@@ -48,23 +46,17 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  //Future<void> _streakUpdate() async {}
-
   @override
   void initState() {
-    //_streakUpdate();
-
     _loadTodayGoals();
 
     super.initState();
     Future.delayed(const Duration(milliseconds: 400), () {
-      //settings
       setState(() {
         _isVisible = true;
       });
     });
     Future.delayed(const Duration(milliseconds: 600), () {
-      //user card
       setState(() {
         _isVisible1 = true;
       });
@@ -90,16 +82,12 @@ class _HomePageState extends State<HomePage> {
                   borderRadius: BorderRadius.circular(16),
                 ),
                 elevation: 4,
-                color: Colors.white, // Blue background
+                color: Colors.white,
                 child: SizedBox(
                   width: 60,
                   height: 60,
                   child: Center(
-                    child: Icon(
-                      Icons.settings,
-                      color: Colors.blue, // White icon
-                      size: 24,
-                    ),
+                    child: Icon(Icons.settings, color: Colors.blue, size: 24),
                   ),
                 ),
               ),
@@ -135,9 +123,9 @@ class _HomePageState extends State<HomePage> {
                     ),
                   ),
                 ),
+                const SizedBox(height: 16),
                 Center(
                   child: AnimatedSlide(
-                    //player card
                     offset: _isVisible ? Offset(0, 0) : Offset(0, 10),
                     duration: const Duration(milliseconds: 2000),
                     curve: Curves.easeInOut,
@@ -147,10 +135,17 @@ class _HomePageState extends State<HomePage> {
                       ),
                       elevation: 4,
                       color: Colors.white,
-                      child: SizedBox(width: 380, height: 190),
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Text(
+                          "Tip: ${tip!}",
+                          style: TextStyle(fontSize: 16, color: Colors.orange),
+                        ),
+                      ),
                     ),
                   ),
                 ),
+                const SizedBox(height: 16),
                 AnimatedSlide(
                   offset: _isVisible ? Offset(0, 0) : Offset(0, 30),
                   duration: const Duration(milliseconds: 2000),
@@ -173,14 +168,14 @@ class _HomePageState extends State<HomePage> {
                               borderRadius: BorderRadius.circular(16),
                             ),
                             elevation: 4,
-                            color: Colors.white, // Blue background
+                            color: Colors.white,
                             child: SizedBox(
                               width: 60,
                               height: 60,
                               child: Center(
                                 child: Icon(
                                   Icons.directions_run,
-                                  color: Colors.blue, // White icon
+                                  color: Colors.blue,
                                   size: 24,
                                 ),
                               ),
@@ -201,14 +196,14 @@ class _HomePageState extends State<HomePage> {
                               borderRadius: BorderRadius.circular(16),
                             ),
                             elevation: 4,
-                            color: Colors.white, // Blue background
+                            color: Colors.white,
                             child: SizedBox(
                               width: 60,
                               height: 60,
                               child: Center(
                                 child: Icon(
                                   Icons.fitness_center,
-                                  color: Colors.blue, // White icon
+                                  color: Colors.blue,
                                   size: 24,
                                 ),
                               ),
@@ -216,20 +211,27 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         GestureDetector(
-                          onTap: temp,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LeaderboardPage(),
+                              ),
+                            );
+                          },
                           child: Card(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
                             elevation: 4,
-                            color: Colors.white, // Blue background
+                            color: Colors.white,
                             child: SizedBox(
                               width: 60,
                               height: 60,
                               child: Center(
                                 child: Icon(
                                   Icons.emoji_events,
-                                  color: Colors.blue, // White icon
+                                  color: Colors.blue,
                                   size: 24,
                                 ),
                               ),
@@ -237,20 +239,27 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         GestureDetector(
-                          onTap: temp,
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => LeaderboardPage(),
+                              ),
+                            );
+                          },
                           child: Card(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
                             ),
                             elevation: 4,
-                            color: Colors.white, // Blue background
+                            color: Colors.white,
                             child: SizedBox(
                               width: 60,
                               height: 60,
                               child: Center(
                                 child: Icon(
                                   Icons.bar_chart,
-                                  color: Colors.blue, // White icon
+                                  color: Colors.blue,
                                   size: 24,
                                 ),
                               ),
@@ -289,26 +298,30 @@ class _HomePageState extends State<HomePage> {
                                 final sets = todaysGoals[base + 3];
                                 final weight = todaysGoals[base + 4];
 
-                                return Card(
-                                  color: Colors.white,
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(12),
-                                  ),
-                                  margin: const EdgeInsets.symmetric(
-                                    vertical: 6,
-                                    horizontal: 8,
-                                  ),
-                                  child: ListTile(
-                                    title: Text(
-                                      name,
-                                      style: const TextStyle(
-                                        fontWeight: FontWeight.bold,
-                                        color: Colors.blue,
-                                        fontSize: 20,
-                                      ),
+                                return SizedBox(
+                                  width: 200,
+                                  child: Card(
+                                    color: Colors.white,
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(12),
                                     ),
-                                    subtitle: Text(
-                                      "$name  •  $sets x $reps @ ${weight}lbs",
+                                    margin: const EdgeInsets.symmetric(
+                                      vertical: 6,
+                                      horizontal: 8,
+                                    ),
+
+                                    child: ListTile(
+                                      title: Text(
+                                        name,
+                                        style: const TextStyle(
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.blue,
+                                          fontSize: 20,
+                                        ),
+                                      ),
+                                      subtitle: Text(
+                                        "$name  •  $sets x $reps @ ${weight}lbs",
+                                      ),
                                     ),
                                   ),
                                 );

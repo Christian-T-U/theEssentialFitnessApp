@@ -16,8 +16,18 @@ int? run;
 
 List<dynamic>? exerciseArray;
 
-List<dynamic>? runtimes;
+List<dynamic>? runs;
 
 bool? tutorial;
 
 User? user;
+
+List<dynamic>? bestRun1mi;
+
+List<dynamic>? bestRun2mi;
+
+List<dynamic>? bestRun5mi;
+
+List<dynamic>? bestRun10mi;
+
+String? tip;

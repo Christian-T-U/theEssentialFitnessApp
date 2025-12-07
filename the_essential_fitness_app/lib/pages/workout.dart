@@ -33,7 +33,7 @@ class _ExercisesPageState extends State<ExercisesPage> {
     "Sunday",
   ];
 
-  int _dayConvert(String day) {
+  int _dtoi(String day) {
     switch (day) {
       case 'Monday':
         return 1;
@@ -53,6 +53,26 @@ class _ExercisesPageState extends State<ExercisesPage> {
     return 7;
   }
 
+  String _itod(int day) {
+    switch (day) {
+      case 1:
+        return 'Monday';
+      case 2:
+        return 'Tuesday';
+      case 3:
+        return 'Wednesday';
+      case 4:
+        return 'Thursday';
+      case 5:
+        return 'Friday';
+      case 6:
+        return 'Saturday';
+      case 7:
+        return 'Sunday';
+    }
+    return 'Sunday';
+  }
+
   Future<void> _addExercise() async {
     if (selectedDay == null) return;
     final String name = nameController.text.trim();
@@ -60,7 +80,7 @@ class _ExercisesPageState extends State<ExercisesPage> {
     final int reps = int.tryParse(repsController.text) ?? 0;
     final int sets = int.tryParse(setsController.text) ?? 0;
     final double weight = double.tryParse(weightController.text) ?? 0;
-    final int day = _dayConvert(selectedDay!);
+    final int day = _dtoi(selectedDay!);
     exerciseArray!.addAll([day, name, reps, sets, weight]);
     await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({
       'exercises': exerciseArray,
@@ -92,182 +112,173 @@ class _ExercisesPageState extends State<ExercisesPage> {
           Positioned.fill(
             child: Image.asset('assets/app_background.jpg', fit: BoxFit.cover),
           ),
-          Positioned(
-            top: 30,
-            left: 20,
-            child: GestureDetector(
-              onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(builder: (_) => HomePage()),
-                );
-              },
-              child: Card(
-                shape: RoundedRectangleBorder(
-                  borderRadius: BorderRadius.circular(16),
-                ),
-                elevation: 4,
-                child: SizedBox(
-                  width: 60,
-                  height: 60,
-                  child: Icon(Icons.home, color: Colors.blue, size: 28),
-                ),
+
+          GestureDetector(
+            onTap: () {
+              Navigator.pop(context);
+            },
+            child: Card(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(16),
+              ),
+              elevation: 4,
+              child: SizedBox(
+                width: 60,
+                height: 60,
+                child: Icon(Icons.home, color: Colors.blue, size: 28),
               ),
             ),
           ),
-          Positioned.fill(
-            top: 110,
-            child: SingleChildScrollView(
-              child: Padding(
-                padding: const EdgeInsets.all(12),
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Card(
-                      elevation: 4,
-                      child: Padding(
-                        padding: const EdgeInsets.all(16),
-                        child: Column(
+          Padding(
+            padding: const EdgeInsets.all(12),
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                SizedBox(height: 64),
+                Card(
+                  elevation: 4,
+                  child: Padding(
+                    padding: const EdgeInsets.all(16),
+                    child: Column(
+                      children: [
+                        Row(
                           children: [
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: DropdownButtonFormField<String>(
-                                    decoration: const InputDecoration(
-                                      labelText: "Day",
-                                      border: OutlineInputBorder(),
-                                    ),
-                                    value: selectedDay,
-                                    items:
-                                        items.map((day) {
-                                          return DropdownMenuItem(
-                                            value: day,
-                                            child: Text(day),
-                                          );
-                                        }).toList(),
-                                    onChanged: (v) {
-                                      setState(() => selectedDay = v);
-                                    },
-                                  ),
+                            Expanded(
+                              child: DropdownButtonFormField<String>(
+                                decoration: const InputDecoration(
+                                  labelText: "Day",
+                                  border: OutlineInputBorder(),
                                 ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: TextField(
-                                    controller: nameController,
-                                    decoration: const InputDecoration(
-                                      labelText: "Exercise Name",
-                                      border: OutlineInputBorder(),
-                                    ),
-                                  ),
-                                ),
-                              ],
+                                value: selectedDay,
+                                items:
+                                    items.map((day) {
+                                      return DropdownMenuItem(
+                                        value: day,
+                                        child: Text(day),
+                                      );
+                                    }).toList(),
+                                onChanged: (v) {
+                                  setState(() => selectedDay = v);
+                                },
+                              ),
                             ),
-                            const SizedBox(height: 12),
-                            Row(
-                              children: [
-                                Expanded(
-                                  child: TextField(
-                                    controller: setsController,
-                                    keyboardType: TextInputType.number,
-                                    decoration: const InputDecoration(
-                                      labelText: "Sets",
-                                      border: OutlineInputBorder(),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: TextField(
-                                    controller: repsController,
-                                    keyboardType: TextInputType.number,
-                                    decoration: const InputDecoration(
-                                      labelText: "Reps",
-                                      border: OutlineInputBorder(),
-                                    ),
-                                  ),
-                                ),
-                                const SizedBox(width: 10),
-                                Expanded(
-                                  child: TextField(
-                                    controller: weightController,
-                                    keyboardType: TextInputType.number,
-                                    decoration: const InputDecoration(
-                                      labelText: "Weight (lbs)",
-                                      border: OutlineInputBorder(),
-                                    ),
-                                  ),
-                                ),
-                              ],
-                            ),
-
-                            const SizedBox(height: 16),
-
-                            ElevatedButton.icon(
-                              onPressed: _addExercise,
-                              icon: const Icon(Icons.add),
-                              label: const Text("Add Exercise"),
-                              style: ElevatedButton.styleFrom(
-                                backgroundColor: Colors.blue,
-                                foregroundColor: Colors.white,
-                                padding: const EdgeInsets.symmetric(
-                                  horizontal: 24,
-                                  vertical: 12,
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: TextField(
+                                controller: nameController,
+                                decoration: const InputDecoration(
+                                  labelText: "Exercise Name",
+                                  border: OutlineInputBorder(),
                                 ),
                               ),
                             ),
                           ],
                         ),
-                      ),
-                    ),
-                    const SizedBox(height: 20),
-                    if (exerciseArray != null && exerciseArray!.isNotEmpty)
-                      ListView.builder(
-                        itemCount: exerciseArray!.length ~/ 5,
-                        shrinkWrap: true,
-                        physics: const NeverScrollableScrollPhysics(),
-                        itemBuilder: (context, i) {
-                          int idx = i * 5;
-
-                          final base = exerciseArray![idx];
-                          final name = exerciseArray![base + 1];
-                          final reps = exerciseArray![base + 2];
-                          final sets = exerciseArray![base + 3];
-                          final weight = exerciseArray![base + 4];
-
-                          return Card(
-                            elevation: 4,
-                            margin: const EdgeInsets.symmetric(vertical: 8),
-                            child: ListTile(
-                              title: Text(
-                                name,
-                                style: const TextStyle(
-                                  fontWeight: FontWeight.bold,
-                                  color: Colors.blue,
-                                  fontSize: 20,
+                        const SizedBox(height: 12),
+                        Row(
+                          children: [
+                            Expanded(
+                              child: TextField(
+                                controller: setsController,
+                                keyboardType: TextInputType.number,
+                                decoration: const InputDecoration(
+                                  labelText: "Sets",
+                                  border: OutlineInputBorder(),
                                 ),
-                              ),
-                              subtitle: Text(
-                                "$name  •  $sets x $reps @ ${weight}lbs",
-                              ),
-                              trailing: IconButton(
-                                icon: const Icon(
-                                  Icons.delete,
-                                  color: Colors.red,
-                                ),
-                                onPressed: () => _deleteExercise(idx),
                               ),
                             ),
-                          );
-                        },
-                      )
-                    else
-                      const Text(
-                        "No exercises created.",
-                        style: TextStyle(color: Colors.white, fontSize: 20),
-                      ),
-                  ],
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: TextField(
+                                controller: repsController,
+                                keyboardType: TextInputType.number,
+                                decoration: const InputDecoration(
+                                  labelText: "Reps",
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                            const SizedBox(width: 10),
+                            Expanded(
+                              child: TextField(
+                                controller: weightController,
+                                keyboardType: TextInputType.number,
+                                decoration: const InputDecoration(
+                                  labelText: "Weight (lbs)",
+                                  border: OutlineInputBorder(),
+                                ),
+                              ),
+                            ),
+                          ],
+                        ),
+
+                        const SizedBox(height: 16),
+
+                        ElevatedButton.icon(
+                          onPressed: _addExercise,
+                          icon: const Icon(Icons.add, color: Colors.lightGreen),
+                          label: const Text("Add Exercise"),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: Colors.blue,
+                            foregroundColor: Colors.white,
+                            padding: const EdgeInsets.symmetric(
+                              horizontal: 24,
+                              vertical: 12,
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
                 ),
-              ),
+                const SizedBox(height: 20),
+                if (exerciseArray != null && exerciseArray!.isNotEmpty)
+                  Expanded(
+                    child: ListView.builder(
+                      itemCount: exerciseArray!.length ~/ 5,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, i) {
+                        int idx = i * 5;
+
+                        final day = exerciseArray![idx]; // int
+                        final name = exerciseArray![idx + 1]; // String
+                        final reps = exerciseArray![idx + 2]; // int
+                        final sets = exerciseArray![idx + 3]; // int
+                        final weight = exerciseArray![idx + 4];
+
+                        return Card(
+                          elevation: 4,
+                          margin: const EdgeInsets.symmetric(vertical: 8),
+                          child: ListTile(
+                            title: Text(
+                              "$name • ${_itod(day)}",
+                              style: const TextStyle(
+                                fontWeight: FontWeight.bold,
+                                color: Colors.blue,
+                                fontSize: 20,
+                              ),
+                            ),
+                            subtitle: Text(
+                              "$name  •  $sets x $reps @ ${weight}lbs",
+                            ),
+                            trailing: IconButton(
+                              icon: const Icon(Icons.delete, color: Colors.red),
+                              onPressed: () => _deleteExercise(idx),
+                            ),
+                          ),
+                        );
+                      },
+                    ),
+                  )
+                else
+                  Expanded(
+                    child: const Text(
+                      "No exercises created.",
+                      style: TextStyle(color: Colors.white, fontSize: 20),
+                    ),
+                  ),
+              ],
             ),
           ),
         ],

@@ -7,6 +7,7 @@ import '../common/global.dart';
 import './home.dart';
 import './sign_up.dart';
 import 'tos.dart';
+import 'dart:math';
 
 class signUpPage extends StatefulWidget {
   const signUpPage({super.key});
@@ -20,6 +21,7 @@ class _signUpPageState extends State<signUpPage> {
   final TextEditingController _nametag = TextEditingController();
   final TextEditingController _password = TextEditingController();
   final TextEditingController _password1 = TextEditingController();
+  String? _errorMessage;
 
   bool _tos = false;
 
@@ -45,19 +47,25 @@ class _signUpPageState extends State<signUpPage> {
     String password1 = _password1.text.trim();
 
     if (email == '' || password == '' || password1 == '' || nametag == '') {
-      print('Error: One of the fields was not filled in.');
+      setState(() {
+        _errorMessage = 'Error: One of the fields was not filled in.';
+      });
       return;
     }
 
     if (!_tos) {
-      print('Error: You must agree to the TOS.');
+      setState(() {
+        _errorMessage = 'Error: You must agree to the TOS.';
+      });
       return;
     }
 
     if (password != password1) {
       _password.clear();
       _password1.clear();
-      print('passwords dont match');
+      setState(() {
+        _errorMessage = 'Error: Passwords did not match up';
+      });
       return;
     }
 
@@ -66,18 +74,15 @@ class _signUpPageState extends State<signUpPage> {
 
   Future<void> _signUp(String email, String nametag, String password) async {
     try {
-      // Create a new user with Firebase Authentication
       UserCredential result = await FirebaseAuth.instance
           .createUserWithEmailAndPassword(email: email, password: password);
-
-      // Get the user ID
       User? user = result.user;
-
-      // Optionally, create a matching user document in Firestore
+      int rn = Random().nextInt(9999);
+      String newNametag = "$nametag#${rn}";
       if (user != null) {
         final today = DateTime.now();
         await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
-          'nametag': nametag,
+          'nametag': newNametag,
           'height': 0,
           'weight': 0,
           'streak': 0,
@@ -86,21 +91,34 @@ class _signUpPageState extends State<signUpPage> {
           'tutorial': false,
           'exercises': [],
           'runs': [],
+          'bestRun1mi': [],
+          'bestRun2mi': [],
+          'bestRun5mi': [],
+          'bestRun10mi': [],
         });
-        print('✅ User created successfully: ${user.uid}');
+        setState(() {
+          _errorMessage =
+              'User created successfully: ${user.uid}.\n Please navigate back to sign in page.';
+        });
       }
     } on FirebaseAuthException catch (e) {
       if (e.code == 'weak-password') {
-        print('❌ The password provided is too weak.');
+        setState(() {
+          _errorMessage = 'The password provided is too weak.';
+        });
       } else if (e.code == 'email-already-in-use') {
-        print('❌ The account already exists for that email.');
+        setState(() {
+          _errorMessage = 'The account already exists for that email.';
+        });
       } else if (e.code == 'invalid-email') {
-        print('❌ The email address is not valid.');
+        setState(() {
+          _errorMessage = 'The email address is not valid.';
+        });
       } else {
-        print('❌ FirebaseAuthException: ${e.message}');
+        setState(() {
+          _errorMessage = 'FirebaseAuthException: ${e.message}';
+        });
       }
-    } catch (e) {
-      print('❌ General error: $e');
     }
   }
 
@@ -109,16 +127,12 @@ class _signUpPageState extends State<signUpPage> {
     return Scaffold(
       body: Stack(
         children: [
-          // Background image
           Positioned.fill(
             child: Image.asset('assets/app_background.jpg', fit: BoxFit.cover),
           ),
-
-          // SafeArea for all content
           SafeArea(
             child: Column(
               children: [
-                // Back button
                 Padding(
                   padding: const EdgeInsets.all(16.0),
                   child: Align(
@@ -139,8 +153,6 @@ class _signUpPageState extends State<signUpPage> {
                     ),
                   ),
                 ),
-
-                // Scrollable form
                 Expanded(
                   child: SingleChildScrollView(
                     padding: const EdgeInsets.symmetric(
@@ -177,8 +189,6 @@ class _signUpPageState extends State<signUpPage> {
                           obscureText: true,
                         ),
                         const SizedBox(height: 16),
-
-                        // TOS checkbox and text
                         Row(
                           children: [
                             ElevatedButton(
@@ -252,14 +262,14 @@ class _signUpPageState extends State<signUpPage> {
                             ),
                           ),
                         ),
+                        Text(
+                          _errorMessage != null ? _errorMessage! : "",
+                          style: TextStyle(color: Colors.red),
+                        ),
                       ],
                     ),
                   ),
                 ),
-                const SizedBox(height: 24),
-                //Expanded(
-                //Text(_errorMessage, style: TextStyle(color: Colors.red)),
-                //),
               ],
             ),
           ),
