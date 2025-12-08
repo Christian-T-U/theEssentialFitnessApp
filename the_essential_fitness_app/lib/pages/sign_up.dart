@@ -1,22 +1,17 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../firebase_options.dart';
-import '../common/global.dart';
-import './home.dart';
-import './sign_up.dart';
 import 'tos.dart';
 import 'dart:math';
 
-class signUpPage extends StatefulWidget {
-  const signUpPage({super.key});
+class SignUpPage extends StatefulWidget {
+  const SignUpPage({super.key});
 
   @override
-  _signUpPageState createState() => _signUpPageState();
+  SignUpPageState createState() => SignUpPageState();
 }
 
-class _signUpPageState extends State<signUpPage> {
+class SignUpPageState extends State<SignUpPage> {
   final TextEditingController _email = TextEditingController();
   final TextEditingController _nametag = TextEditingController();
   final TextEditingController _password = TextEditingController();
@@ -47,25 +42,27 @@ class _signUpPageState extends State<signUpPage> {
     String password1 = _password1.text.trim();
 
     if (email == '' || password == '' || password1 == '' || nametag == '') {
-      setState(() {
-        _errorMessage = 'Error: One of the fields was not filled in.';
-      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Error: One of the fields was not filled in.'),
+        ),
+      );
       return;
     }
 
     if (!_tos) {
-      setState(() {
-        _errorMessage = 'Error: You must agree to the TOS.';
-      });
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Error: You must agree to the TOS.')),
+      );
       return;
     }
 
     if (password != password1) {
       _password.clear();
       _password1.clear();
-      setState(() {
-        _errorMessage = 'Error: Passwords did not match up';
-      });
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text('Passwords did not match.')));
       return;
     }
 
@@ -78,13 +75,12 @@ class _signUpPageState extends State<signUpPage> {
           .createUserWithEmailAndPassword(email: email, password: password);
       User? user = result.user;
       int rn = Random().nextInt(9999);
-      String newNametag = "$nametag#${rn}";
+      String newNametag = "$nametag#$rn";
       if (user != null) {
         final today = DateTime.now();
         await FirebaseFirestore.instance.collection('users').doc(user.uid).set({
           'nametag': newNametag,
           'height': 0,
-          'weight': 0,
           'streak': 0,
           'tasksComplete': false,
           'registered': today,
@@ -95,6 +91,7 @@ class _signUpPageState extends State<signUpPage> {
           'bestRun2mi': [],
           'bestRun5mi': [],
           'bestRun10mi': [],
+          'weightbf': [],
         });
         setState(() {
           _errorMessage =
@@ -102,22 +99,26 @@ class _signUpPageState extends State<signUpPage> {
         });
       }
     } on FirebaseAuthException catch (e) {
-      if (e.code == 'weak-password') {
-        setState(() {
-          _errorMessage = 'The password provided is too weak.';
-        });
-      } else if (e.code == 'email-already-in-use') {
-        setState(() {
-          _errorMessage = 'The account already exists for that email.';
-        });
-      } else if (e.code == 'invalid-email') {
-        setState(() {
-          _errorMessage = 'The email address is not valid.';
-        });
-      } else {
-        setState(() {
-          _errorMessage = 'FirebaseAuthException: ${e.message}';
-        });
+      if (mounted) {
+        if (e.code == 'weak-password') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('The password provided is too weak.')),
+          );
+        } else if (e.code == 'email-already-in-use') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('The account already exists for that email.'),
+            ),
+          );
+        } else if (e.code == 'invalid-email') {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('The email address is not valid.')),
+          );
+        } else {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('FirebaseAuthException')),
+          );
+        }
       }
     }
   }
@@ -162,32 +163,157 @@ class _signUpPageState extends State<signUpPage> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.stretch,
                       children: [
-                        _buildTextField(
-                          _email,
-                          'Email',
-                          TextInputType.emailAddress,
-                        ),
-                        const SizedBox(height: 16),
-                        _buildTextField(
-                          _nametag,
-                          'nametag',
-                          TextInputType.text,
+                        Theme(
+                          data: Theme.of(context).copyWith(
+                            textSelectionTheme: const TextSelectionThemeData(
+                              cursorColor: Colors.blue,
+                              selectionColor: Colors.blueAccent,
+                              selectionHandleColor: Colors.blue,
+                            ),
+                          ),
+                          child: TextField(
+                            controller: _email,
+                            keyboardType: TextInputType.text,
+                            obscureText: false,
+                            style: const TextStyle(color: Colors.white),
+                            decoration: InputDecoration(
+                              labelText: 'Email',
+                              labelStyle: const TextStyle(color: Colors.white),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(12),
+                                ),
+                                borderSide: const BorderSide(
+                                  color: Colors.white,
+                                ),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(12),
+                                ),
+                                borderSide: BorderSide(
+                                  color: Colors.blue,
+                                  width: 2.0,
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
 
                         const SizedBox(height: 16),
-                        _buildTextField(
-                          _password,
-                          'Password',
-                          TextInputType.text,
-                          obscureText: true,
+                        Theme(
+                          data: Theme.of(context).copyWith(
+                            textSelectionTheme: const TextSelectionThemeData(
+                              cursorColor: Colors.blue,
+                              selectionColor: Colors.blueAccent,
+                              selectionHandleColor: Colors.blue,
+                            ),
+                          ),
+                          child: TextField(
+                            controller: _nametag,
+                            keyboardType: TextInputType.text,
+                            obscureText: false,
+                            style: const TextStyle(color: Colors.white),
+                            decoration: InputDecoration(
+                              labelText: 'Nametag',
+                              labelStyle: const TextStyle(color: Colors.white),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(12),
+                                ),
+                                borderSide: const BorderSide(
+                                  color: Colors.white,
+                                ),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(12),
+                                ),
+                                borderSide: BorderSide(
+                                  color: Colors.blue,
+                                  width: 2.0,
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
+
                         const SizedBox(height: 16),
-                        _buildTextField(
-                          _password1,
-                          'Confirm Password',
-                          TextInputType.text,
-                          obscureText: true,
+                        Theme(
+                          data: Theme.of(context).copyWith(
+                            textSelectionTheme: const TextSelectionThemeData(
+                              cursorColor: Colors.blue,
+                              selectionColor: Colors.blueAccent,
+                              selectionHandleColor: Colors.blue,
+                            ),
+                          ),
+                          child: TextField(
+                            controller: _password,
+                            keyboardType: TextInputType.text,
+                            obscureText: true,
+                            style: const TextStyle(color: Colors.white),
+                            decoration: InputDecoration(
+                              labelText: 'Password',
+                              labelStyle: const TextStyle(color: Colors.white),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(12),
+                                ),
+                                borderSide: const BorderSide(
+                                  color: Colors.white,
+                                ),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(12),
+                                ),
+                                borderSide: BorderSide(
+                                  color: Colors.blue,
+                                  width: 2.0,
+                                ),
+                              ),
+                            ),
+                          ),
                         ),
+
+                        const SizedBox(height: 16),
+                        Theme(
+                          data: Theme.of(context).copyWith(
+                            textSelectionTheme: const TextSelectionThemeData(
+                              cursorColor: Colors.blue,
+                              selectionColor: Colors.blueAccent,
+                              selectionHandleColor: Colors.blue,
+                            ),
+                          ),
+                          child: TextField(
+                            controller: _password1,
+                            keyboardType: TextInputType.text,
+                            obscureText: true,
+                            style: const TextStyle(color: Colors.white),
+                            decoration: InputDecoration(
+                              labelText: 'Confirm Password',
+                              labelStyle: const TextStyle(color: Colors.white),
+                              enabledBorder: OutlineInputBorder(
+                                borderRadius: const BorderRadius.all(
+                                  Radius.circular(12),
+                                ),
+                                borderSide: const BorderSide(
+                                  color: Colors.white,
+                                ),
+                              ),
+                              focusedBorder: const OutlineInputBorder(
+                                borderRadius: BorderRadius.all(
+                                  Radius.circular(12),
+                                ),
+                                borderSide: BorderSide(
+                                  color: Colors.blue,
+                                  width: 2.0,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
+
                         const SizedBox(height: 16),
                         Row(
                           children: [
@@ -274,41 +400,6 @@ class _signUpPageState extends State<signUpPage> {
             ),
           ),
         ],
-      ),
-    );
-  }
-
-  Widget _buildTextField(
-    TextEditingController controller,
-    String label,
-    TextInputType keyboardType, {
-    bool obscureText = false,
-  }) {
-    return Theme(
-      data: Theme.of(context).copyWith(
-        textSelectionTheme: const TextSelectionThemeData(
-          cursorColor: Colors.blue,
-          selectionColor: Colors.blueAccent,
-          selectionHandleColor: Colors.blue,
-        ),
-      ),
-      child: TextField(
-        controller: controller,
-        keyboardType: keyboardType,
-        obscureText: obscureText,
-        style: const TextStyle(color: Colors.white),
-        decoration: InputDecoration(
-          labelText: label,
-          labelStyle: const TextStyle(color: Colors.white),
-          enabledBorder: OutlineInputBorder(
-            borderRadius: const BorderRadius.all(Radius.circular(12)),
-            borderSide: const BorderSide(color: Colors.white),
-          ),
-          focusedBorder: const OutlineInputBorder(
-            borderRadius: BorderRadius.all(Radius.circular(12)),
-            borderSide: BorderSide(color: Colors.blue, width: 2.0),
-          ),
-        ),
       ),
     );
   }

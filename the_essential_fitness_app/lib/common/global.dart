@@ -9,7 +9,6 @@ String? nametag;
 int? height;
 
 //weight of the user (lbs)
-int? weight;
 
 //runtime of the user (min/mile)
 int? run;
@@ -31,3 +30,5 @@ List<dynamic>? bestRun5mi;
 List<dynamic>? bestRun10mi;
 
 String? tip;
+
+List<dynamic>? weightbf;

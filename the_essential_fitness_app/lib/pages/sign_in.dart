@@ -1,8 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import '../firebase_options.dart';
 import '../common/global.dart';
 import './home.dart';
 import './sign_up.dart';
@@ -19,7 +17,6 @@ class _SignInPageState extends State<SignInPage> {
   final TextEditingController _emailController = TextEditingController();
   final TextEditingController _passwordController = TextEditingController();
   final _auth = FirebaseAuth.instance;
-  //final user = FirebaseAuth.instance.currentUser;
 
   bool _isVisible = false;
   bool _isVisible1 = false;
@@ -53,7 +50,7 @@ class _SignInPageState extends State<SignInPage> {
 
     nametag = userData?['nametag'];
     height = userData?['height'];
-    weight = userData?['weight'];
+    weightbf = userData?['weightbf'];
     exerciseArray = userData?['exercises'];
     runs = userData?['runs'];
     tutorial = userData?['tutorial'];
@@ -61,8 +58,6 @@ class _SignInPageState extends State<SignInPage> {
     bestRun2mi = userData?['bestRun2mi'];
     bestRun5mi = userData?['bestRun5mi'];
     bestRun10mi = userData?['bestRun10mi'];
-
-    //get tip from server
     final docTwo =
         await FirebaseFirestore.instance.collection('tips').doc('1').get();
     final docData = docTwo.data();
@@ -80,30 +75,39 @@ class _SignInPageState extends State<SignInPage> {
       user = result.user;
 
       if (user != null) {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Signed in successfully!')),
-        );
-        try {
-          await _update();
-        } catch (e) {
-          print('Update failed: $e');
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Signed in successfully!')),
+          );
+          try {
+            await _update();
+          } catch (e) {
+            if (mounted) {
+              ScaffoldMessenger.of(
+                context,
+              ).showSnackBar(const SnackBar(content: Text('Update failed.')));
+            }
+          }
+          if (mounted) {
+            Navigator.pushReplacement(
+              context,
+              MaterialPageRoute(builder: (context) => const HomePage()),
+            );
+          }
         }
-        if (!mounted) return;
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const HomePage()),
-        );
       } else {
-        if (!mounted) return;
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Sign in failed — no user found.')),
-        );
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Sign in failed — no user found.')),
+          );
+        }
       }
     } on FirebaseAuthException catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(e.message ?? 'Sign in failed')));
+      if (mounted) {
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(SnackBar(content: Text(e.message ?? 'Sign in failed')));
+      }
     }
   }
 
@@ -156,7 +160,7 @@ class _SignInPageState extends State<SignInPage> {
                           Navigator.push(
                             context,
                             MaterialPageRoute(
-                              builder: (context) => signUpPage(),
+                              builder: (context) => SignUpPage(),
                             ),
                           );
                         },
@@ -189,7 +193,7 @@ class _SignInPageState extends State<SignInPage> {
                     keyboardType: TextInputType.emailAddress,
                     style: const TextStyle(color: Colors.white),
                     decoration: InputDecoration(
-                      labelText: 'Email/Username',
+                      labelText: 'Email',
                       labelStyle: const TextStyle(color: Colors.white),
                       enabledBorder: OutlineInputBorder(
                         borderRadius: const BorderRadius.all(
@@ -238,7 +242,7 @@ class _SignInPageState extends State<SignInPage> {
                   onTap: () {
                     Navigator.push(
                       context,
-                      MaterialPageRoute(builder: (context) => signUpPage()),
+                      MaterialPageRoute(builder: (context) => SignUpPage()),
                     );
                   },
                   child: const Text(
@@ -284,8 +288,11 @@ class _SignInPageState extends State<SignInPage> {
                   ),
                 ),
                 const SizedBox(height: 24),
-                Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                Wrap(
+                  spacing: 16,
+                  runSpacing: 16,
+                  alignment: WrapAlignment.center,
+
                   children: [
                     AnimatedSlide(
                       offset: _isVisible ? Offset(0, 0) : Offset(0, 4),
@@ -325,6 +332,7 @@ class _SignInPageState extends State<SignInPage> {
                         ),
                       ),
                     ),
+
                     AnimatedSlide(
                       offset: _isVisible1 ? Offset(0, 0) : Offset(0, 4),
                       duration: const Duration(milliseconds: 4000),
@@ -363,6 +371,7 @@ class _SignInPageState extends State<SignInPage> {
                         ),
                       ),
                     ),
+
                     AnimatedSlide(
                       offset: _isVisible2 ? Offset(0, 0) : Offset(0, 4),
                       duration: const Duration(milliseconds: 4000),

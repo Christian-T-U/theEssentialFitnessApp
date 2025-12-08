@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import '../firebase_options.dart';
 import '../common/global.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:async';
-import 'home.dart';
 
 class ExercisesPage extends StatefulWidget {
   const ExercisesPage({super.key});
@@ -115,7 +110,7 @@ class _ExercisesPageState extends State<ExercisesPage> {
 
           GestureDetector(
             onTap: () {
-              Navigator.pop(context);
+              Navigator.pop(context, true);
             },
             child: Card(
               shape: RoundedRectangleBorder(
@@ -237,14 +232,13 @@ class _ExercisesPageState extends State<ExercisesPage> {
                     child: ListView.builder(
                       itemCount: exerciseArray!.length ~/ 5,
                       shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
                       itemBuilder: (context, i) {
                         int idx = i * 5;
 
-                        final day = exerciseArray![idx]; // int
-                        final name = exerciseArray![idx + 1]; // String
-                        final reps = exerciseArray![idx + 2]; // int
-                        final sets = exerciseArray![idx + 3]; // int
+                        final day = exerciseArray![idx];
+                        final name = exerciseArray![idx + 1];
+                        final reps = exerciseArray![idx + 2];
+                        final sets = exerciseArray![idx + 3];
                         final weight = exerciseArray![idx + 4];
 
                         return Card(

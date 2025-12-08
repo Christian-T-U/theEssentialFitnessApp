@@ -1,12 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import '../firebase_options.dart';
 import '../common/global.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:async';
-import 'home.dart';
 
 class LeaderboardPage extends StatefulWidget {
   const LeaderboardPage({super.key});
@@ -24,6 +19,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
   @override
   void initState() {
     getLeaderboard(_distanceSet);
+    super.initState();
   }
 
   void _reloadLeaderboard() {
@@ -52,7 +48,6 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
     }
 
     for (var doc in users.docs) {
-      //organize all playerbase into leaderboard list playername(string), (date), time
       final data = doc.data();
 
       if (data[name].isNotEmpty) {
@@ -67,13 +62,9 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
         ]);
       }
     }
-    print("${leaderboard.length}\n");
-    //sort the list according to leaderboardadd format ^^^
     for (int i = 0; i < leaderboard.length; i += 3) {
       bool inserted = false;
       for (int j = 0; j < sortedLeaderboard.length; j += 3) {
-        //search for where to insert
-        //find where it is belongs
         if (leaderboard[j + 1] < sortedLeaderboard[j + 1]) {
           sortedLeaderboard.insert(j, leaderboard[i]);
           sortedLeaderboard.insert(j + 1, leaderboard[i + 1]);
@@ -90,7 +81,6 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
         ]);
       }
     }
-    //find in leaderboard nametag
     double pos = 0;
     for (int i = 0; i < sortedLeaderboard.length; i += 3) {
       if (sortedLeaderboard[i] == nametag!) {
@@ -137,7 +127,6 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                // PlayerCard
                 Text(
                   "-Leaderboards-",
                   style: TextStyle(
@@ -147,9 +136,8 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                   ),
                 ),
                 const SizedBox(height: 16),
-                // listbuilder
                 _loaded == false
-                    ? CircularProgressIndicator()
+                    ? SizedBox(height: 102)
                     : Card(
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(12),
@@ -158,8 +146,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                       child: Padding(
                         padding: const EdgeInsets.all(12.0),
                         child: Column(
-                          mainAxisSize:
-                              MainAxisSize.min, // Shrinks card to content
+                          mainAxisSize: MainAxisSize.min,
                           crossAxisAlignment: CrossAxisAlignment.center,
                           children: [
                             Text(
@@ -171,7 +158,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                                 fontFamily: "Noto Sans Black",
                               ),
                             ),
-                            SizedBox(height: 8), // spacing between texts
+                            SizedBox(height: 8),
                             Text(
                               playerPosition == null
                                   ? "UNRANKED"
@@ -257,7 +244,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                       String name = sortedLeaderboard[base];
                       int time = sortedLeaderboard[base + 1];
                       String day = sortedLeaderboard[base + 2];
-                      int placement = (index / 3 + 1).toInt();
+                      int placement = (index + 1);
                       return SizedBox(
                         width: 200,
                         child: Card(

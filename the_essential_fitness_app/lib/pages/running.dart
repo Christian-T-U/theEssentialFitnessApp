@@ -1,14 +1,11 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import '../firebase_options.dart';
 import '../common/global.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:geolocator/geolocator.dart';
 import 'package:font_awesome_flutter/font_awesome_flutter.dart';
 import 'dart:async';
-import 'home.dart';
 import 'package:fl_chart/fl_chart.dart';
+import 'dart:io' show Platform;
 
 class runningPage extends StatefulWidget {
   const runningPage({super.key});
@@ -27,8 +24,8 @@ class _RunningPageState extends State<runningPage> {
   IconData _icon = FontAwesomeIcons.person;
   double? _distanceSet;
   List<double> distances = [];
-  List<double> _barChartX = [];
-  List<Timestamp> _barChartY = [];
+  final List<double> _barChartX = [];
+  final List<Timestamp> _barChartY = [];
   bool toggle = false;
   double _max = 0;
 
@@ -42,9 +39,9 @@ class _RunningPageState extends State<runningPage> {
     if (runs != null && runs!.length > 2) {
       for (int i = 1; i < runs!.length; i += 3) {
         _barChartY.add(runs![i - 1]);
-        _barChartX.add(runs![i]);
+        _barChartX.add((runs![i] as num).toDouble());
         if (runs![i] > _max) {
-          _max = runs![i];
+          _max = runs![i].toDouble();
         }
       }
     }
@@ -54,14 +51,25 @@ class _RunningPageState extends State<runningPage> {
     return a.year == b.year && a.month == b.month && a.day == b.day;
   }
 
+  Color _colorFunction(int idx) {
+    if (_barChartX.length > 2 && idx > 0) {
+      if (_barChartX[idx] > _barChartX[idx - 1]) {
+        return Colors.green;
+      } else if (_barChartX[idx] < _barChartX[idx - 1]) {
+        return Colors.red;
+      }
+    }
+    return Colors.white;
+  }
+
   Future<void> _updateRuns() async {
     DateTime today = DateTime.now();
 
-    if (runs != null && runs!.length >= 3) {
+    if (runs != null || runs!.length >= 3) {
       int idx = runs!.length;
       Timestamp lastTimestamp = runs![idx - 3];
       DateTime lastRunDay = lastTimestamp.toDate();
-      double lastDist = runs![idx - 2];
+      double lastDist = (runs![idx - 2] as num).toDouble();
       int lastTime = runs![idx - 1];
       if (sameDay(lastRunDay, today)) {
         runs![idx - 2] = lastDist + _totalDist;
@@ -70,7 +78,11 @@ class _RunningPageState extends State<runningPage> {
             .collection('users')
             .doc(user!.uid)
             .update({"runs": runs});
-
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Runs successfully updated.')),
+          );
+        }
         return;
       }
     }
@@ -82,62 +94,54 @@ class _RunningPageState extends State<runningPage> {
     await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({
       'runs': runs,
     });
+    if (mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Runs successfully updated.')),
+      );
+    }
   }
 
-  //update in this order... date, time
-  /*Future<void> _updateBestRuns() async {
-    //executes when dis traveled reaches dist set
-    List<dynamic> run = [DateTime.now(), _timeElapsed.inSeconds];
-    if (_distanceSet == 1) {
-      if (bestRun1mi != null && run[1] < bestRun1mi![1]) {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user!.uid)
-            .update({"bestRun1mi": run});
-      } else {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user!.uid)
-            .update({"bestRun1mi": run});
-      }
-    } else if (_distanceSet == 2) {
-      if (bestRun2mi != null && run[1] < bestRun2mi![1]) {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user!.uid)
-            .update({"bestRun2mi": run});
-      } else {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user!.uid)
-            .update({"bestRun2mi": run});
-      }
-    } else if (_distanceSet == 5) {
-      if (bestRun5mi != null && run[1] < bestRun5mi![1]) {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user!.uid)
-            .update({"bestRun5mi": run});
-      } else {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user!.uid)
-            .update({"bestRun5mi": run});
-      }
-    } else if (_distanceSet == 10) {
-      if (bestRun10mi != null && run[1] < bestRun10mi![1]) {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user!.uid)
-            .update({"bestRun10mi": run});
-      } else {
-        await FirebaseFirestore.instance
-            .collection('users')
-            .doc(user!.uid)
-            .update({"bestRun10mi": run});
-      }
+  Future<void> _updateBestRuns() async {
+    DateTime today = DateTime.now();
+    String trial = "bestRun1mi";
+    List<dynamic> lastEntry;
+
+    switch (_distanceSet) {
+      case 1:
+        trial = "bestRun1mi";
+      case 2:
+        trial = "bestRun2mi";
+      case 5:
+        trial = "bestRun5mi";
+      case 10:
+        trial = "bestRun10mi";
     }
-  }*/
+
+    final doc =
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user!.uid)
+            .get();
+    final userData = doc.data();
+    lastEntry = userData![trial];
+
+    if (lastEntry != []) {
+      if (_timeElapsed.inSeconds < lastEntry[1]) {
+        lastEntry[0] = Timestamp.fromDate(today);
+        lastEntry[1] = _timeElapsed.inSeconds;
+        await FirebaseFirestore.instance
+            .collection('users')
+            .doc(user!.uid)
+            .update({trial: lastEntry});
+      }
+    } else {
+      lastEntry.add({Timestamp.fromDate(today), _timeElapsed.inSeconds});
+      await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user!.uid)
+          .update({trial: lastEntry});
+    }
+  }
 
   String formatDuration(Duration d) {
     String twoDigits(int n) => n.toString().padLeft(2, '0');
@@ -189,38 +193,70 @@ class _RunningPageState extends State<runningPage> {
     }
 
     bool service = await Geolocator.isLocationServiceEnabled();
-    if (!service) {
-      print('service disabled');
-      return;
-    }
-
-    LocationPermission permission = await Geolocator.checkPermission();
-    if (permission == LocationPermission.denied) {
-      permission = await Geolocator.requestPermission();
-      if (permission == LocationPermission.denied) {
-        print('permission denied');
-        return;
+    if (Platform.isAndroid) {
+      if (!service) {
+        if (mounted) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Service disabled.')));
+          return;
+        }
       }
-    }
 
-    if (permission == LocationPermission.deniedForever) {
-      print('permission denied forever');
-      return;
+      LocationPermission permission = await Geolocator.checkPermission();
+      if (permission == LocationPermission.denied) {
+        permission = await Geolocator.requestPermission();
+        if (permission == LocationPermission.denied) {
+          if (mounted) {
+            ScaffoldMessenger.of(
+              context,
+            ).showSnackBar(const SnackBar(content: Text('Permission denied.')));
+            return;
+          }
+        }
+      }
+
+      if (permission == LocationPermission.deniedForever) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(content: Text('Permission denied forever.')),
+          );
+          return;
+        }
+      }
     }
 
     const LocationSettings settings = LocationSettings(
       accuracy: LocationAccuracy.high,
-      distanceFilter: 1,
     );
     setState(() {
       _runStarted = true;
     });
     startTimer();
 
+    Position? lastPosition;
     _positionStream = Geolocator.getPositionStream(
       locationSettings: settings,
     ).listen((Position pos) {
-      _totalDist += 1.0;
+      if (lastPosition == null) {
+        lastPosition = pos;
+      } else {
+        double difference = Geolocator.distanceBetween(
+          lastPosition!.latitude,
+          lastPosition!.longitude,
+          pos.latitude,
+          pos.longitude,
+        );
+        _totalDist += difference;
+        lastPosition = pos;
+      }
+
+      if (_totalDist >= _distanceSet! * 1609.344) {
+        _updateBestRuns();
+        endRun();
+        return;
+      }
+
       _curSpeed = pos.speed * 2.23694;
       if (0 == _curSpeed) {
         _icon = FontAwesomeIcons.person;
@@ -234,13 +270,7 @@ class _RunningPageState extends State<runningPage> {
         _icon = FontAwesomeIcons.car;
         endRun();
       }
-    });
-    if (_totalDist == _distanceSet) {
-      //_updateBestRuns();
-      endRun();
-    }
-    setState(() {
-      _icon;
+      setState(() {});
     });
   }
 
@@ -259,16 +289,12 @@ class _RunningPageState extends State<runningPage> {
                 borderRadius: BorderRadius.circular(16),
               ),
               elevation: 4,
-              color: Colors.white, // Blue background
+              color: Colors.white,
               child: SizedBox(
                 width: 60,
                 height: 60,
                 child: Center(
-                  child: Icon(
-                    Icons.home,
-                    color: Colors.blue, // White icon
-                    size: 24,
-                  ),
+                  child: Icon(Icons.home, color: Colors.blue, size: 24),
                 ),
               ),
             ),
@@ -407,9 +433,7 @@ class _RunningPageState extends State<runningPage> {
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
-                //impliment textbutton ------------------------------------
-                const SizedBox(height: 16),
+                const SizedBox(height: 32),
                 Text(
                   "-Run History (meters)-",
                   style: TextStyle(
@@ -432,9 +456,7 @@ class _RunningPageState extends State<runningPage> {
                             BarChartRodData(
                               toY: _barChartX[index],
                               width: 18,
-                              color:
-                                  Colors
-                                      .white, //impliment color function -----------
+                              color: _colorFunction(index),
                               borderRadius: BorderRadius.circular(2),
                             ),
                           ],
@@ -442,10 +464,9 @@ class _RunningPageState extends State<runningPage> {
                       }),
 
                       barTouchData: BarTouchData(
-                        enabled: true, // enable touch
+                        enabled: true,
                         touchTooltipData: BarTouchTooltipData(
-                          tooltipBgColor:
-                              Colors.white, // background color of tooltip
+                          tooltipBgColor: Colors.white,
                           tooltipPadding: EdgeInsets.all(8),
                           tooltipMargin: 4,
                           getTooltipItem: (group, groupIndex, rod, rodIndex) {

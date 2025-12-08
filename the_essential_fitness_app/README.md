@@ -3,68 +3,68 @@
 ---
 
 ## DESCRIPTION
+
 Looking for a fitness app that motivates you to work out without the hassle of
 costly subscriptions? The Essential Fitness App is designed to keep you inspired and
-engaged. This app helps you track your workouts while adding a fun, gamified experience. It
-records your bottom, average, and top running speeds during each session using location
-data, monitors your progress on lifts, and generates performance scores based on your
-data. To encourage healthy competition, the app features a verified running leaderboard.
+engaged. This app helps you track your workouts while adding a fun, gamified experience.
+To encourage healthy competition, the app features a verified running leaderboard.
 Additionally, it provides detailed progression charts for all exercises, helping you visualize
 your progress and stay motivated. All this information will be stored securely in a database
 using Firestore.
 
 ---
 
-## TABLE OF CONTENTS
- - [Installation]
- - [Features]
-    1. Built-in coaching/pep talking
-    2. Progress Tracking
-    3. Customizable Experience
-    4. Running Leaderboard
-    5. Training Plan
-    6. Weekly Workout Scheduling
- - [licence]
+## HOW TO USE APP
+
+Launch using flutter run in a perferred andriod emulator
+$ flutter emulators --launch Medium_Phone_API_35
+
+Make an account with the sign up page or use an existing account with the following credentials...
+Email: ctutrup@gmail.com
+Password: BetaTester1234
+
+### RUNNING PAGE
+
+Select a running distance you would like to achieve.
+
+Hit the 'start run' button.
+
+At anytime hit 'stop run' to update run history and stop the run.
+
+Run to the end of the initial distance goal to potentially add a personal record for that distance.
+
+### EXERCISE PAGE
+
+Enter the fields.
+
+Click the 'add exercise' to add the exercise to your routine.
+
+To delete exercises click the delete button located on each card of the list.
+
+### LEADERBOARD PAGE
+
+To become ranked in a field the user must participate in a full run first.
+
+To view rankings click on a run division (1mi, 2mi, 5mi, 10mi).
+
+### SETTINGS PAGE
+
+The texteditors are preloaded with your current info.
+
+Change whatever you like and click save changes.
+
+Delete your account with the delete button.
 
 ---
 
-## CONTACT
-Created by [Christian Utrup](https://github.com/Christian-T-U)
+## LEFT UNFINISHED
 
----
+I did plan to impliment a way to track health as that would round out a fitness app but
+ran out of time. I was going to use BMI as a metric for this but I didn't prioritize this
+goal at all.
 
-## CREDITS
- - backround image by [Freep!k](https://www.freepik.com/)
+I didn't impliment a way to track progress on lifts because it was too difficult to
+monitor and quantify progress/no progress. I did impliment tracking for running.
 
-## FUTURE FEATURES
-(gpt wrapper?)
- - Fitness trainer (Chuck): Chuck is a chicken. If the user selects cluck as their trainer they will give fitness advice for muscle growth. Color associated (red)
- - Fitness trainer (Tabitha): Tabitha is a tabycat. If the user selects cluck as their trainer they will give fitness advice for endurance training. Color associated (yellow)
- - Fitness trainer (Gray): Gray is a greyhound. If the user selects cluck as their trainer they will give fitness advice for losing weight. Color associated (grey)
- - Fitness trainer (Kong): Kong is a gorrilla. If the user selects cluck as their trainer they will give fitness advice for explosiveness. Color associated (purple)
- - Running categories supported: 1-mi, 2-mi, 1-km, 2-km, 5-km, 10-km, 15-km, 20-km, Half-Marathon (21.1-km/13.1-mi), 25-km, 30-km, 35-km, 40-km, Full-Marathon (42.2-km/26.2-mi).
- - everytime accessing the weightlifting page give a user warning
- - bench/lat pull-down/squat/deadlift progress chart
- - Weight-lifting categories supported: 
-
- OR
-
- make avatar designs
-
-(All exersises will have a rep field, time, field, and weight field. Graduate button will increment any non null fields by a certain amount.)
-
-(chest)
-  push-ups, decline push-ups, bench-press, incline bench-press, decline bench-press, pec deck flyes,
-(legs/glutes)
-  squats, barbell squats, hacksquat, leg-press, leg-extensions, leg-curls, hip-thrusts, 
-(back)
-  pull-ups, lat pull-downs, T-bar rows, bent-over row, back-extensions, 
-(abs)
-  ab crunches, v-ups, hanging leg-raises, plank, side plank, 
-(biceps)
-  dumbell curls, preacher curls, decline curls, hammer curls, reverse curls
-(triceps)
-  skull-crushers, tricep-extensions, overhead tricep-extensions, cross-body tricep-extensions, 
-(shoulders)
-  pike push-ups, lateral-raises, overhead press, reverse pec deck flyes
-(running/walking)
+On some of the input text fields I didn't check for proper inputs so it just converts to
+the type I was expecting utilizing conversion methods.

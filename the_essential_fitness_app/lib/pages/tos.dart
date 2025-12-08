@@ -8,12 +8,9 @@ class tosPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          // 🔹 Background image
           Positioned.fill(
             child: Image.asset('assets/app_background.jpg', fit: BoxFit.cover),
           ),
-
-          // 🔹 Back button
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.all(16.0),
@@ -33,8 +30,6 @@ class tosPage extends StatelessWidget {
               ),
             ),
           ),
-
-          // 🔹 ToS Content
           SafeArea(
             child: Padding(
               padding: const EdgeInsets.symmetric(
@@ -44,9 +39,7 @@ class tosPage extends StatelessWidget {
               child: SingleChildScrollView(
                 child: Container(
                   decoration: BoxDecoration(
-                    color: Colors.blue.withOpacity(
-                      0.6,
-                    ), // soft transparent blue
+                    color: Colors.blue,
                     borderRadius: BorderRadius.circular(16),
                   ),
                   padding: const EdgeInsets.all(16.0),

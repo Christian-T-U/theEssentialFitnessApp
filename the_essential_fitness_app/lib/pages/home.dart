@@ -1,12 +1,9 @@
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:firebase_core/firebase_core.dart';
-import '../firebase_options.dart';
-import 'package:syncfusion_flutter_charts/charts.dart';
 import '../common/global.dart';
 import 'running.dart';
 import 'workout.dart';
 import 'leaderboard.dart';
+import 'settings.dart';
 
 class HomePage extends StatefulWidget {
   const HomePage({super.key});
@@ -19,10 +16,6 @@ class _HomePageState extends State<HomePage> {
   bool _isVisible = false;
   bool _isVisible1 = false;
   List<dynamic> todaysGoals = [];
-
-  void temp() {
-    print('pressed');
-  }
 
   Future<void> _loadTodayGoals() async {
     final now = DateTime.now();
@@ -43,6 +36,26 @@ class _HomePageState extends State<HomePage> {
           todaysGoals;
         });
       }
+    }
+  }
+
+  Future<void> _goToPage(String page) async {
+    bool reload = false;
+    if (page == "exercisePage") {
+      reload = await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => ExercisesPage()),
+      );
+    } else if (page == "settingsPage") {
+      reload = await Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => SettingsPage()),
+      );
+    }
+    if (reload == true) {
+      todaysGoals = [];
+      _loadTodayGoals();
+      setState(() {});
     }
   }
 
@@ -76,7 +89,9 @@ class _HomePageState extends State<HomePage> {
             duration: const Duration(milliseconds: 600),
             curve: Curves.easeInOut,
             child: GestureDetector(
-              onTap: temp,
+              onTap: () {
+                _goToPage("settingsPage");
+              },
               child: Card(
                 shape: RoundedRectangleBorder(
                   borderRadius: BorderRadius.circular(16),
@@ -138,7 +153,7 @@ class _HomePageState extends State<HomePage> {
                       child: Padding(
                         padding: const EdgeInsets.all(16),
                         child: Text(
-                          "Tip: ${tip!}",
+                          tip != null ? "Tip: ${tip!}" : "error",
                           style: TextStyle(fontSize: 16, color: Colors.orange),
                         ),
                       ),
@@ -184,12 +199,7 @@ class _HomePageState extends State<HomePage> {
                         ),
                         GestureDetector(
                           onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ExercisesPage(),
-                              ),
-                            );
+                            _goToPage("exercisePage");
                           },
                           child: Card(
                             shape: RoundedRectangleBorder(
@@ -239,14 +249,7 @@ class _HomePageState extends State<HomePage> {
                           ),
                         ),
                         GestureDetector(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => LeaderboardPage(),
-                              ),
-                            );
-                          },
+                          onTap: () {},
                           child: Card(
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(16),
@@ -258,7 +261,7 @@ class _HomePageState extends State<HomePage> {
                               height: 60,
                               child: Center(
                                 child: Icon(
-                                  Icons.bar_chart,
+                                  Icons.favorite,
                                   color: Colors.blue,
                                   size: 24,
                                 ),
@@ -290,6 +293,7 @@ class _HomePageState extends State<HomePage> {
                               ),
                             )
                             : ListView.builder(
+                              physics: ScrollPhysics(),
                               itemCount: todaysGoals.length ~/ 5,
                               itemBuilder: (context, index) {
                                 final base = index * 5;
