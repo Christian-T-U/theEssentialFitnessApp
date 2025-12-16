@@ -304,7 +304,7 @@ class _RunningPageState extends State<runningPage> {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  "-Run Divisions-",
+                  "-Run Distances-",
                   style: TextStyle(
                     fontWeight: FontWeight.bold,
                     color: Colors.white,

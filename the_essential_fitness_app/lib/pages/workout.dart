@@ -99,6 +99,22 @@ class _ExercisesPageState extends State<ExercisesPage> {
     setState(() {});
   }
 
+  Future<void> _updateExercise(
+    int idx,
+    double weight,
+    int sets,
+    int reps,
+  ) async {
+    exerciseArray![idx + 2] = reps;
+    exerciseArray![idx + 3] = sets;
+    exerciseArray![idx + 4] = weight;
+
+    await FirebaseFirestore.instance.collection('users').doc(user!.uid).update({
+      'exercises': exerciseArray,
+    });
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -241,24 +257,108 @@ class _ExercisesPageState extends State<ExercisesPage> {
                         final sets = exerciseArray![idx + 3];
                         final weight = exerciseArray![idx + 4];
 
+                        final listReps = TextEditingController(
+                          text: reps.toString(),
+                        );
+                        final listSets = TextEditingController(
+                          text: sets.toString(),
+                        );
+                        final listWeight = TextEditingController(
+                          text: weight.toString(),
+                        );
+
                         return Card(
-                          elevation: 4,
-                          margin: const EdgeInsets.symmetric(vertical: 8),
-                          child: ListTile(
-                            title: Text(
-                              "$name • ${_itod(day)}",
-                              style: const TextStyle(
-                                fontWeight: FontWeight.bold,
-                                color: Colors.blue,
-                                fontSize: 20,
-                              ),
-                            ),
-                            subtitle: Text(
-                              "$name  •  $sets x $reps @ ${weight}lbs",
-                            ),
-                            trailing: IconButton(
-                              icon: const Icon(Icons.delete, color: Colors.red),
-                              onPressed: () => _deleteExercise(idx),
+                          margin: const EdgeInsets.symmetric(
+                            horizontal: 12,
+                            vertical: 6,
+                          ),
+                          child: Padding(
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Text(
+                                  "${_itod(day)} - $name",
+                                  style: const TextStyle(
+                                    fontSize: 18,
+                                    fontWeight: FontWeight.bold,
+                                  ),
+                                ),
+
+                                const SizedBox(height: 12),
+
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: TextField(
+                                        controller: listSets,
+                                        keyboardType: TextInputType.number,
+                                        decoration: const InputDecoration(
+                                          labelText: "Sets",
+                                          border: OutlineInputBorder(),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: TextField(
+                                        controller: listReps,
+                                        keyboardType: TextInputType.number,
+                                        decoration: const InputDecoration(
+                                          labelText: "Reps",
+                                          border: OutlineInputBorder(),
+                                        ),
+                                      ),
+                                    ),
+                                    const SizedBox(width: 8),
+                                    Expanded(
+                                      child: TextField(
+                                        controller: listWeight,
+                                        keyboardType: TextInputType.number,
+                                        decoration: const InputDecoration(
+                                          labelText: "Weight",
+                                          border: OutlineInputBorder(),
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 12),
+                                Center(
+                                  child: ElevatedButton.icon(
+                                    onPressed: () {
+                                      _deleteExercise(idx);
+                                    },
+                                    icon: const Icon(
+                                      Icons.delete,
+                                      color: Colors.white,
+                                    ),
+                                    label: const Text("Delete Exercise"),
+                                    style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                      foregroundColor: Colors.white,
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 24,
+                                        vertical: 12,
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                                const SizedBox(height: 12),
+                                Center(
+                                  child: IconButton(
+                                    icon: Icon(Icons.save, color: Colors.green),
+                                    onPressed: () {
+                                      _updateExercise(
+                                        idx,
+                                        double.parse(listWeight.text),
+                                        int.parse(listSets.text),
+                                        int.parse(listReps.text),
+                                      );
+                                    },
+                                  ),
+                                ),
+                              ],
                             ),
                           ),
                         );

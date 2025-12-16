@@ -14,13 +14,29 @@ using Firestore.
 
 ---
 
+## ABOUT THE APP
+
+I use cloud firebase auth for safe login and sign out.
+
+I use firestore to hold all user data so the user can sign in anywhere
+
+I use geolocator for tracking user position
+
+Not super unique but does have a leaderboard which not all running apps have and a random fitness tip every time you enter the app.
+
+Is hypothetically accessible to all users with an android device
+
+Is submitted with an apk format
+
+---
+
 ## HOW TO USE APP
 
 Launch using flutter run in a perferred andriod emulator
 $ flutter emulators --launch Medium_Phone_API_35
 
 Make an account with the sign up page or use an existing account with the following credentials...
-Email: ctutrup@gmail.com
+Email: ctutrup@csuchico.edu
 Password: BetaTester1234
 
 ### RUNNING PAGE

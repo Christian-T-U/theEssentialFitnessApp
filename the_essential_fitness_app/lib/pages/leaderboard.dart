@@ -50,7 +50,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
     for (var doc in users.docs) {
       final data = doc.data();
 
-      if (data[name].isNotEmpty) {
+      if (data[name] != null && data[name].isNotEmpty) {
         String playerName = data["nametag"];
         Timestamp date = data[name][0];
         int time = data[name][1];
@@ -238,6 +238,7 @@ class _LeaderboardPageState extends State<LeaderboardPage> {
                 const SizedBox(height: 16),
                 Expanded(
                   child: ListView.builder(
+                    physics: ScrollPhysics(),
                     itemCount: sortedLeaderboard.length ~/ 3,
                     itemBuilder: (context, index) {
                       int base = index * 3;
